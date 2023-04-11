@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>To-Do App</title>
+      <style>
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  background-color: #fff;
+  margin-bottom: 5px;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0px 2px 2px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+li .edit-btn {
+  margin-left: 10px;
+}
+
+li button[type="submit"] {
+  margin-left: 10px;
+}
+
+li span {
+  flex-grow: 1;
+}
+
+input[type="text"],
+select {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  margin-right: 10px;
+}
+
+input[type="submit"],
+li button[type="submit"] {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #008CBA;
+  color: #fff;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover,
+li button[type="submit"]:hover {
+  background-color: #006F8F;
+}
+
+input[type="date"] {
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  margin-right: 10px;
+}
+
+      </style>
+  </head>
+  <body>
+    <h1>ToDo List</h1>
+
+<form method="POST" action="{{ url_for('index') }}">
+  <input type="text" name="content">
+  <select name="degree">
+    <option value="high">High</option>
+    <option value="medium">Medium</option>
+    <option value="low">Low</option>
+  </select>
+  <input type="date" name="duedate"> <!-- new input field for due date -->
+  <input type="submit" value="Add">
+</form>
+
+
+    <hr>
+    <ul>
+      {% for todo in todos %}
+        <li>
+          <span>{{ todo.content }}</span>
+          <b>{{ todo.degree }}</b>
+          {% if todo.duedate %}
+            <i>{{ todo.duedate }}</i>
+          {% endif %}
+          <form method="POST" action="{{ url_for('delete', id=todo._id) }}">
+            <button type="submit">Delete</button>
+          </form>
+          <button class="edit-btn" onclick="showEditForm('{{ todo._id }}')">Edit</button>
+
+          <form class="edit-form" id="edit-form-{{ todo._id }}" method="POST" action="{{ url_for('update', id=todo._id) }}" style="display: none;">
+            <label for="edit-content-{{ todo._id }}">Task:</label>
+            <input type="text" id="edit-content-{{ todo._id }}" name="content" value="{{ todo.content }}" required>
+
+            <label for="edit-degree-{{ todo._id }}">Priority:</label>
+            <select id="edit-degree-{{ todo._id }}" name="degree">
+              <option value="high" {% if todo.degree == 'high' %}selected{% endif %}>High</option>
+              <option value="medium" {% if todo.degree == 'medium' %}selected{% endif %}>Medium</option>
+              <option value="low" {% if todo.degree == 'low' %}selected{% endif %}>Low</option>
+            </select>
+
+            <label for="edit-duedate-{{ todo._id }}">Due Date:</label>
+            <input type="date" id="edit-duedate-{{ todo._id }}" name="duedate" value="{% if todo.duedate %}{{ todo.duedate }}{% endif %}">
+
+            <button type="submit">Save</button>
+            <button type="button" onclick="hideEditForm('{{ todo._id }}')">Cancel</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+    <script>
+      function showEditForm(id) {
+        document.getElementById('edit-form-' + id).style.display = 'block';
+      }
+
+      function hideEditForm(id) {
+        document.getElementById('edit-form-' + id).style.display = 'none';
+      }
+    </script>
+  <hr>
+  </body>
+</html>
